@@ -16,14 +16,17 @@ export const proxy = ctx => {
           return target[property];
         } else if (property === "on") {
           return (name, callback) => {
+            if (name in target) {
+              observable.change(name, target[name]);
+            }
             observable.on(name, callback);
           };
         } else if (property === "off") {
-          return token => {
-            observable.off(token);
+          return callback => {
+            observable.off(callback);
           };
         } else {
-          return null;
+          return undefined;
         }
       },
       set: (target, property, value) => {
@@ -37,6 +40,7 @@ export const proxy = ctx => {
           });
           observable.change(property, value);
         }
+        return true;
       }
     });
     ctx.proxy = () => proxy;

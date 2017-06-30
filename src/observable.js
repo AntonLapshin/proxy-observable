@@ -34,16 +34,15 @@ export class Observable {
    * 
    * @param {string} property - Property name
    * @param {object} value - New value
-   * @returns {boolean}
+   * @returns {object} Observable
    */
   change(property, value) {
-    if (property in this.callbacks === false) {
-      return false;
-    }
     const _value = this.values[property];
     this.values[property] = value;
-    this.callbacks[property].forEach(с => с(value, _value));
-    return true;
+    if (property in this.callbacks) {
+      this.callbacks[property].forEach(с => с(value, _value));
+    }
+    return this;
   }
 
   /**
@@ -55,12 +54,13 @@ export class Observable {
   off(callback) {
     for (const property in this.callbacks) {
       const cc = this.callbacks[property];
-      cc.forEach((c, i) => {
+      for (let i = 0; i < cc.length; i++) {
+        const c = cc[i];
         if (c === callback) {
           cc.splice(i, 1);
           return true;
         }
-      });
+      }
     }
     return false;
   }
