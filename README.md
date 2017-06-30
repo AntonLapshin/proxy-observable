@@ -20,7 +20,7 @@ Usage
 import { proxy } from "proxy-observable";
 
 const soldier = {
-  name: "Titos Pullo",
+  name: "Titus Pullo",
   age: 36,
   inventory: proxy({
     sword: "Dagger",
@@ -31,7 +31,7 @@ const soldier = {
 console.log(JSON.stringify(soldier)); 
 /*
 {
-  "name": "Titos Pullo",
+  "name": "Titus Pullo",
   "age": 36,
   "inventory": { "sword": "Dagger", "coins": 10 }
 }
@@ -63,7 +63,7 @@ console.log(soldier.inventory.proxy().notExistingProp); // undefined
 console.log(soldier.inventory.notExistingProp); // undefined
 ```
 
-Simply speaking `soldier.inventory.proxy()` is the same object as soldier.inventory but it has additionally a few things:
+Simply speaking `soldier.inventory.proxy()` is the same object as `soldier.inventory` but it has additionally a few things:
 
 + method `proxy().on` for subscribing
 ```js
