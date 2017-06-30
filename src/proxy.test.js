@@ -17,6 +17,10 @@ describe("Proxy", () => {
       done();
     });
 
+    const fakeCallback = () => {};
+    data.inventory.proxy().on("nonExistingField", fakeCallback);
+    fakeCallback();
+
     should.not.exist(data.inventory.proxy().shield);
     data.inventory.coins.should.be.equal(10);
     data.inventory.proxy().coins.should.be.equal(10);

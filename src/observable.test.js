@@ -20,6 +20,7 @@ describe("Observable", () => {
       should.not.exist(_value);
       done();
     });
+    item.on("test", () => {}); // second callback to the pool
     item.change("test", true);
   });
 
@@ -39,6 +40,9 @@ describe("Observable", () => {
     };
     item.off(callback).should.be.equal(false);
     item.on("test", callback);
+    const fakeCallback = () => {};
+    item.off(fakeCallback).should.be.equal(false);
+    fakeCallback();
     item.change("test", true);
     item.off(callback).should.be.equal(true);
     item.change("test", false);
