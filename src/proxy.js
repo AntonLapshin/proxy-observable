@@ -1,7 +1,7 @@
 import { Observable } from "./observable";
 
 /**
- * Creates a proxy object and adds a getter of that proxy to an object
+ * Creates a proxy object and adds a getter of that proxy to the object
  * 
  * @param {object} ctx Input Object
  * @returns {object} Input Object
