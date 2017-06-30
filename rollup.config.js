@@ -3,9 +3,9 @@ import babel from "rollup-plugin-babel";
 import uglify from "rollup-plugin-uglify";
 
 export default {
-  entry: "src/main.js",
+  entry: "src/proxy.js",
   format: "umd",
-  moduleName: "uit",
+  moduleName: "proxyObservable",
   plugins: [
     resolve(),
     babel({
@@ -37,5 +37,5 @@ export default {
       }
     })
   ],
-  dest: "bin/uit.min.js"
+  dest: "bin/proxy.observable.min.js"
 };
