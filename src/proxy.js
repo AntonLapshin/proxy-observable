@@ -15,6 +15,12 @@ export const proxy = ctx => {
         if (property in target) {
           return target[property];
         } else if (property === "on") {
+          /**
+           * on: Subscribes on property change
+           * 
+           * @param {string} name Property name
+           * @param {function} callback (value, oldvalue) => {}
+           */
           return (name, callback) => {
             if (name in target) {
               observable.change(name, target[name]);
@@ -22,6 +28,11 @@ export const proxy = ctx => {
             observable.on(name, callback);
           };
         } else if (property === "off") {
+          /**
+           * off: Unsubscribes from property change
+           * 
+           * @param {function} callback (value, oldvalue) => {}
+           */
           return callback => {
             observable.off(callback);
           };
@@ -32,13 +43,8 @@ export const proxy = ctx => {
       set: (target, property, value) => {
         if (observable.has(property)) {
           observable.change(property, value);
-        } else if (property in target) {
-          target[property] = value;
         } else {
-          observable.on(property, value => {
-            ctx[property] = value;
-          });
-          observable.change(property, value);
+          target[property] = value;
         }
         return true;
       }
