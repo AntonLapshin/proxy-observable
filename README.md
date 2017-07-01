@@ -5,8 +5,9 @@ ES6 Proxy observable implementation
 [![Coverage Status](https://coveralls.io/repos/github/AntonLapshin/proxy-observable/badge.svg?branch=master&v=1)](https://coveralls.io/github/AntonLapshin/proxy-observable?branch=master)
 [![Gemnasium](https://img.shields.io/gemnasium/mathiasbynens/he.svg)]()
 ![Lib Size](http://img.badgesize.io/AntonLapshin/proxy-observable/master/bin/proxy.observable.min.js.svg?compression=gzip)
+[![npm](https://img.shields.io/npm/dt/proxy-observable.svg)](https://www.npmjs.com/package/proxy-observable)
 
-One more JavaScript observable implementation??? xD Anyway I hope you'll forgive me! :)
+One more JavaScript observable implementation??? xD Anyway, I hope you'll forgive me! :)
 
 Install
 -------
