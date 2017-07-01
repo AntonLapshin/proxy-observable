@@ -38,16 +38,18 @@ console.log(JSON.stringify(soldier));
 */
 
 const callback = (value, _value) => {
-  console.log(value, _value); // 12 10
+  console.log(value, _value); // 999 10
 }
-
-soldier.inventory.proxy().on("coins", callback);
 
 console.log(soldier.inventory.coins); // 10
 console.log(soldier.inventory.proxy().coins); // 10
 console.log(soldier.inventory.sword); // "Dagger"
 console.log(soldier.inventory.proxy().sword); // "Dagger"
 
+soldier.inventory.proxy().on("coins", callback);
+
+soldier.inventory.coins.coins = 999; // callback will not be called
+soldier.inventory.coins.proxy().coins = 999; // callback will be called
 
 soldier.inventory.proxy().off(callback);
 ```
@@ -59,19 +61,19 @@ soldier.inventory.proxy().newProp = true;
 console.log(soldier.inventory.proxy().newProp); // true
 console.log(soldier.inventory.newProp); // true
 
-console.log(soldier.inventory.proxy().notExistingProp); // undefined
-console.log(soldier.inventory.notExistingProp); // undefined
+console.log(soldier.inventory.proxy().nonExistingProp); // undefined
+console.log(soldier.inventory.nonExistingProp); // undefined
 ```
 
 Simply speaking `soldier.inventory.proxy()` is the same object as `soldier.inventory` but it has additionally a few things:
 
 + method `proxy().on` for subscribing
 ```js
-(property, callback) => {}
+proxy().on = (property, callback) => {} // callback takes two arguments: new value and old value
 ```
 + method `proxy().off` for unsubscribing
 ```js
-(callback) => {}
+proxy().off = (callback) => {}
 ```
 + you can call just `proxy().newProp = value` to define a new prop, instead of using `jsonObject["newProp"] = value` syntax
 
