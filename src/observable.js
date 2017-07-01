@@ -37,10 +37,10 @@ export class Observable {
    * @returns {object} Observable
    */
   change(property, value) {
-    const _value = this.values[property];
+    const prev = this.values[property];
     this.values[property] = value;
     if (property in this.callbacks) {
-      this.callbacks[property].forEach(с => с(value, _value));
+      this.callbacks[property].forEach(с => с(value, prev));
     }
     return this;
   }
@@ -73,8 +73,8 @@ export class Observable {
    */
   once(property, callback) {
     const method = value => {
-      const _value = this.values[property];
-      callback(value, _value);
+      const prev = this.values[property];
+      callback(value, prev);
       this.off(method);
     };
     this.on(property, method);

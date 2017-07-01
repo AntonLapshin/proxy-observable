@@ -3,54 +3,54 @@ import { proxy } from "./proxy";
 
 describe("Proxy", () => {
   it("basic usage", done => {
-    const data = {
+    const soldier = {
       name: "Titos Pullo",
       age: 36,
       inventory: proxy({
         sword: "Dagger",
-        coins: 10
+        coins: 0
       })
     };
-    data.inventory.proxy().on("coins", (value, _value) => {
-      value.should.be.equal(12);
-      _value.should.be.equal(10);
+
+    soldier.inventory.on("coins", (value, prev) => {
+      value.should.be.equal(100);
+      prev.should.be.equal(0);
       done();
     });
 
-    const fakeCallback = () => {};
-    data.inventory.proxy().on("nonExistingField", fakeCallback);
-    fakeCallback();
+    // non existing
+    const callback = () => {};
+    soldier.inventory.on("nonExistingField", callback);
+    callback();
 
-    should.not.exist(data.inventory.proxy().shield);
-    data.inventory.coins.should.be.equal(10);
-    data.inventory.proxy().coins.should.be.equal(10);
-    should.exist(data.inventory.proxy);
-    data.inventory.proxy().coins = 12;
+    should.not.exist(soldier.inventory.nonExistingField);
+    soldier.inventory.coins.should.be.equal(0);
+    soldier.inventory.coins = 100;
   });
 
   it("advanced usage", () => {
-    const data = {
+    const soldier = {
       name: "Titos Pullo",
       age: 36,
       inventory: proxy({
         sword: "Dagger",
-        coins: 10
+        coins: 0
       })
     };
     let n = 0;
-    const callback = (value, _value) => {
+    const callback = (value, prev) => {
       n++;
     };
-    data.inventory.proxy().on("coins", callback);
+    soldier.inventory.on("coins", callback);
 
-    data.inventory.proxy().coins = 12;
-    data.inventory.proxy().off(callback);
-    data.inventory.proxy().coins = 1200;
+    soldier.inventory.coins = 100;
+    soldier.inventory.off(callback);
+    soldier.inventory.coins = 999;
     n.should.be.equal(1);
 
-    data.inventory.proxy().shield = "Scutum";
-    data.inventory.shield.should.be.equal("Scutum");
+    soldier.inventory.shield = "Scutum";
+    soldier.inventory.shield.should.be.equal("Scutum");
 
-    proxy(data.inventory).coins.should.be.equal(1200);
+    proxy(soldier.inventory).coins.should.be.equal(999);
   });
 });

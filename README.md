@@ -8,8 +8,6 @@ ES6 Proxy observable implementation
 [![npm](https://img.shields.io/npm/dt/proxy-observable.svg)](https://www.npmjs.com/package/proxy-observable)
 [![GitHub stars](https://img.shields.io/github/stars/AntonLapshin/proxy-observable.svg?style=social&label=Star)](https://github.com/AntonLapshin/proxy-observable)
 
-One more JavaScript observable implementation??? xD Anyway, I hope you'll forgive me! :)
-
 Install
 -------
 
@@ -26,7 +24,7 @@ const soldier = {
   age: 36,
   inventory: proxy({
     sword: "Dagger",
-    coins: 10
+    coins: 0
   })
 };
 
@@ -35,49 +33,28 @@ console.log(JSON.stringify(soldier));
 {
   "name": "Titus Pullo",
   "age": 36,
-  "inventory": { "sword": "Dagger", "coins": 10 }
+  "inventory": { "sword": "Dagger", "coins": 0 }
 }
 */
 
-const callback = (value, _value) => {
-  console.log(value, _value); // 999 10
+const callback = (value, prev) => {
+  console.log(value, prev); // 100 0
 }
 
-console.log(soldier.inventory.coins); // 10
-console.log(soldier.inventory.proxy().coins); // 10
+console.log(soldier.inventory.coins); // 0
 console.log(soldier.inventory.sword); // "Dagger"
-console.log(soldier.inventory.proxy().sword); // "Dagger"
 
-soldier.inventory.proxy().on("coins", callback);
+soldier.inventory.on("coins", callback);
+soldier.inventory.coins = 100; // callback will be called
 
-soldier.inventory.coins = 999; // callback will not be called
-soldier.inventory.proxy().coins = 999; // callback will be called
-
-soldier.inventory.proxy().off(callback);
+soldier.inventory.off(callback);
 ```
 
-`soldier.inventory` is still just a simple JS object but it has additionally method `proxy()` to get access to the proxy object.
+Simply speaking `soldier.inventory` is still just a simple object, but it has additionally a few things:
 
-```js
-soldier.inventory.proxy().newProp = true;
-console.log(soldier.inventory.proxy().newProp); // true
-console.log(soldier.inventory.newProp); // true
-
-console.log(soldier.inventory.proxy().nonExistingProp); // undefined
-console.log(soldier.inventory.nonExistingProp); // undefined
-```
-
-Simply speaking `soldier.inventory.proxy()` is the same object as `soldier.inventory` but it has additionally a few things:
-
-+ method `proxy().on` for subscribing
-```js
-proxy().on = (property, callback) => {} // callback takes two arguments: new value and old value
-```
-+ method `proxy().off` for unsubscribing
-```js
-proxy().off = (callback) => {}
-```
-+ you can call just `proxy().newProp = value` to define a new prop, instead of using `jsonObject["newProp"] = value` syntax
++ method `on` for subscribing
++ method `off` for unsubscribing
++ you can call just `soldier.inventory.newProp = value` to define a new prop, instead of using `soldier.inventory["newProp"] = value` syntax
 
 ---
 
@@ -103,15 +80,15 @@ Browser Usage
     age: 36,
     inventory: proxy({
       sword: "Dagger",
-      coins: 10
+      coins: 0
     })
   };
 
-  console.log(soldier.inventory.coins); // 10
-  soldier.inventory.proxy().on("coins", (value, _value) => {
-    console.log(value, _value); // 999 10
+  console.log(soldier.inventory.coins); // 0
+  soldier.inventory.on("coins", (value, prev) => {
+    console.log(value, prev); // 100 0
   });
-  soldier.inventory.proxy().coins = 999;
+  soldier.inventory..coins = 100;
 </script>
 ```
 
