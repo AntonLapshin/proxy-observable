@@ -88,7 +88,7 @@ Browser Usage
   soldier.inventory.on("coins", (value, prev) => {
     console.log(value, prev); // 100 0
   });
-  soldier.inventory..coins = 100;
+  soldier.inventory.coins = 100;
 </script>
 ```
 
