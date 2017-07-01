@@ -48,8 +48,8 @@ console.log(soldier.inventory.proxy().sword); // "Dagger"
 
 soldier.inventory.proxy().on("coins", callback);
 
-soldier.inventory.coins.coins = 999; // callback will not be called
-soldier.inventory.coins.proxy().coins = 999; // callback will be called
+soldier.inventory.coins = 999; // callback will not be called
+soldier.inventory.proxy().coins = 999; // callback will be called
 
 soldier.inventory.proxy().off(callback);
 ```
