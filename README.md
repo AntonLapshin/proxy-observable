@@ -6,6 +6,7 @@ ES6 Proxy observable implementation
 [![Gemnasium](https://img.shields.io/gemnasium/mathiasbynens/he.svg)]()
 ![Lib Size](http://img.badgesize.io/AntonLapshin/proxy-observable/master/bin/proxy.observable.min.js.svg?compression=gzip)
 [![npm](https://img.shields.io/npm/dt/proxy-observable.svg)](https://www.npmjs.com/package/proxy-observable)
+[![GitHub stars](https://img.shields.io/github/stars/AntonLapshin/proxy-observable.svg?style=social&label=Star)](https://github.com/AntonLapshin/proxy-observable)
 
 One more JavaScript observable implementation??? xD Anyway, I hope you'll forgive me! :)
 
@@ -85,6 +86,34 @@ ES6 JavaScript Proxy MDN [documentation](https://developer.mozilla.org/en/docs/W
 See also [proxy-observable API](api.md)
 
 ---
+
+Browser Usage
+-----
+
+```html
+<!-- ES6 not minified version -->
+<script src="../node_modules/proxy-observable/bin/proxy.observable.es6.js"></script>
+<!-- ES5 minified version -->
+<!--<script src="../node_modules/proxy-observable/bin/proxy.observable.min.js"></script>-->
+
+<script>
+  const proxy = window.proxyObservable.proxy;
+  const soldier = {
+    name: "Titus Pullo",
+    age: 36,
+    inventory: proxy({
+      sword: "Dagger",
+      coins: 10
+    })
+  };
+
+  console.log(soldier.inventory.coins); // 10
+  soldier.inventory.proxy().on("coins", (value, _value) => {
+    console.log(value, _value); // 999 10
+  });
+  soldier.inventory.proxy().coins = 999;
+</script>
+```
 
 ## Browsers support <sub><sup><sub><sub>made by <a href="https://godban.github.io">godban</a></sub></sub></sup></sub>
 
