@@ -74,7 +74,7 @@ Browser Usage
 <!--<script src="../node_modules/proxy-observable/bin/proxy.observable.min.js"></script>-->
 
 <script>
-  const proxy = window.proxyObservable.proxy;
+  const proxy = window.ProxyObservable.proxy;
   const soldier = {
     name: "Titus Pullo",
     age: 36,

@@ -1,12 +1,12 @@
 <a name="proxy"></a>
 
-## proxy ⇒ <code>object</code>
-Creates a proxy object and adds a getter of that proxy to the object
+## proxy ⇒ <code>Proxy</code>
+Creates a proxy for an object
 
 **Kind**: global constant  
-**Returns**: <code>object</code> - Input Object  
+**Returns**: <code>Proxy</code> - Proxy Object  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ctx | <code>object</code> | Input Object |
+| ctx | <code>object</code> \| <code>Proxy</code> | Input Object |
 

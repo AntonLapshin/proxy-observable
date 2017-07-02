@@ -5,7 +5,7 @@ import uglify from "rollup-plugin-uglify";
 export default {
   entry: "src/proxy.js",
   format: "umd",
-  moduleName: "proxyObservable",
+  moduleName: "ProxyObservable",
   plugins: [
     resolve(),
     babel({
