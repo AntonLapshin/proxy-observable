@@ -6,12 +6,12 @@ import { Observable } from "./observable";
  * @param {object|Proxy} ctx Input Object
  * @returns {Proxy} Proxy Object
  */
-export const proxy = ctx => {
+export default ctx => {
   if (ctx.on && ctx.off) {
     return ctx;
   }
-  const observable = new Observable();
-  const proxy = new Proxy(ctx, {
+  const o = new Observable(ctx);
+  const observable = new Proxy(ctx, {
     get: (target, property) => {
       if (property in target) {
         return target[property];
@@ -24,9 +24,9 @@ export const proxy = ctx => {
          */
         return (name, callback) => {
           if (name in target) {
-            observable.change(name, target[name]);
+            o.change(name, target[name]);
           }
-          observable.on(name, callback);
+          o.on(name, callback);
         };
       } else if (property === "off") {
         /**
@@ -35,15 +35,15 @@ export const proxy = ctx => {
          * @param {function} callback (value, prev) => {}
          */
         return callback => {
-          observable.off(callback);
+          o.off(callback);
         };
       } else {
         return undefined;
       }
     },
     set: (target, property, value) => {
-      if (observable.has(property)) {
-        observable.change(property, value);
+      if (o.has(property)) {
+        o.change(property, value);
       } else {
         target[property] = value;
       }
@@ -51,5 +51,5 @@ export const proxy = ctx => {
     }
   });
 
-  return proxy;
+  return observable;
 };

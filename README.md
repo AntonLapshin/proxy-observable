@@ -17,12 +17,12 @@ Usage
 -----
 
 ```js
-import { proxy } from "proxy-observable";
+import observable from "proxy-observable";
 
 const soldier = {
   name: "Titus Pullo",
   age: 36,
-  inventory: proxy({
+  inventory: observable({
     sword: "Dagger",
     coins: 0
   })
@@ -74,11 +74,10 @@ Browser Usage
 <!--<script src="../node_modules/proxy-observable/bin/proxy.observable.min.js"></script>-->
 
 <script>
-  const proxy = window.ProxyObservable.proxy;
   const soldier = {
     name: "Titus Pullo",
     age: 36,
-    inventory: proxy({
+    inventory: observable({
       sword: "Dagger",
       coins: 0
     })

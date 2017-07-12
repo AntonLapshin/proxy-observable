@@ -1,12 +1,12 @@
 import should from "should";
-import { proxy } from "./proxy";
+import observable from "./proxy";
 
 describe("Proxy", () => {
   it("basic usage", done => {
     const soldier = {
       name: "Titos Pullo",
       age: 36,
-      inventory: proxy({
+      inventory: observable({
         sword: "Dagger",
         coins: 0
       })
@@ -32,7 +32,7 @@ describe("Proxy", () => {
     const soldier = {
       name: "Titos Pullo",
       age: 36,
-      inventory: proxy({
+      inventory: observable({
         sword: "Dagger",
         coins: 0
       })
@@ -51,6 +51,6 @@ describe("Proxy", () => {
     soldier.inventory.shield = "Scutum";
     soldier.inventory.shield.should.be.equal("Scutum");
 
-    proxy(soldier.inventory).coins.should.be.equal(999);
+    observable(soldier.inventory).coins.should.be.equal(999);
   });
 });

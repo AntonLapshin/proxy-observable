@@ -3,7 +3,7 @@ import { Observable } from "./observable";
 
 describe("Observable", () => {
   it("has", () => {
-    const item = new Observable();
+    const item = new Observable({});
     const callback = () => {};
     item.has("test").should.be.equal(false);
     item.on("test", callback);
@@ -14,7 +14,7 @@ describe("Observable", () => {
   });
 
   it("on", done => {
-    const item = new Observable();
+    const item = new Observable({});
     item.on("test", (value, _value) => {
       value.should.be.equal(true);
       should.not.exist(_value);
@@ -25,15 +25,15 @@ describe("Observable", () => {
   });
 
   it("change", () => {
-    const item = new Observable();
+    const item = new Observable({});
     item.change("test", true);
-    item.values["test"].should.be.equal(true);
+    item.target["test"].should.be.equal(true);
     item.change("test", false);
-    item.values["test"].should.be.equal(false);
+    item.target["test"].should.be.equal(false);
   });
 
   it("off", () => {
-    const item = new Observable();
+    const item = new Observable({});
     let n = 0;
     const callback = () => {
       n++;
@@ -50,7 +50,7 @@ describe("Observable", () => {
   });
 
   it("once", () => {
-    const item = new Observable();
+    const item = new Observable({});
     let n = 0;
     const callback = () => {
       n++;

@@ -1,7 +1,7 @@
 export class Observable {
-  constructor() {
+  constructor(target) {
     this.callbacks = {};
-    this.values = {};
+    this.target = target;
   }
 
   /**
@@ -37,8 +37,8 @@ export class Observable {
    * @returns {object} Observable
    */
   change(property, value) {
-    const prev = this.values[property];
-    this.values[property] = value;
+    const prev = this.target[property];
+    this.target[property] = value;
     if (property in this.callbacks) {
       this.callbacks[property].forEach(с => с(value, prev));
     }
@@ -73,7 +73,7 @@ export class Observable {
    */
   once(property, callback) {
     const method = value => {
-      const prev = this.values[property];
+      const prev = this.target[property];
       callback(value, prev);
       this.off(method);
     };
