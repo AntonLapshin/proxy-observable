@@ -72,13 +72,13 @@ describe("Proxy", () => {
     frodo.bag.pop();
   });
 
-  it("all", done => {
+  it("any", done => {
     const frodo = {
       name: "Frodo",
       bag: observable([])
     };
 
-    frodo.bag.on("all", (e, data) => {
+    frodo.bag.on("any", (e, data) => {
       e.should.be.equal("change");
       data.should.be.equal("ring")
       done();      

@@ -160,20 +160,20 @@ Frodo.friends.pop();
 
 Just use `observable` if you want an object or an array to be observable
 
-## `all` event
+## `any` event
 
-Do you want to track all the events? Just use `all` like this:
+Do you want to track all the events? Just use `any` like this:
 
 ```js
 // object
-soldier.inventory.on("all", (e, value, prev) => {
+soldier.inventory.on("any", (e, value, prev) => {
   console.log(e); // "coins", "sword"
 });
 soldier.inventory.coins = 1000;
 soldier.inventory.sword = "Gold Dagger";
 
 // array
-Frodo.bag.on("all", (e, item) => {
+Frodo.bag.on("any", (e, item) => {
   console.log(e); // "change" or "pop"
 });
 ```

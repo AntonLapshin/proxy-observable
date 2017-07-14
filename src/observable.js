@@ -2,7 +2,7 @@ export class Observable {
   constructor(o) {
     this.fns = {};
     this.o = o;
-    this.all = [];
+    this.any = [];
   }
 
   /**
@@ -12,7 +12,7 @@ export class Observable {
    * @returns {boolean}
    */
   has(prop) {
-    return prop in this.fns && this.fns[prop].length > 0 || this.all.length > 0;
+    return prop in this.fns && this.fns[prop].length > 0 || this.any.length > 0;
   }
 
   /**
@@ -23,8 +23,8 @@ export class Observable {
    * @returns {object} Observable
    */
   on(prop, fn) {
-    if (prop === "all") {
-      this.all.push(fn);
+    if (prop === "any") {
+      this.any.push(fn);
       return this;
     }
     if (prop in this.fns === false) {
@@ -43,7 +43,7 @@ export class Observable {
    */
   fire(prop, value) {
     const prev = this.o[prop];
-    this.all.forEach(fn => fn(prop, value, prev));
+    this.any.forEach(fn => fn(prop, value, prev));
     if (prop in this.fns) {
       this.fns[prop].forEach(fn => fn(value, prev));
     }
@@ -66,9 +66,9 @@ export class Observable {
         }
       }
     }
-    for (let i = 0; i < this.all.length; i++) {
-      if (this.all[i] === fn) {
-        this.all.splice(i, 1);
+    for (let i = 0; i < this.any.length; i++) {
+      if (this.any[i] === fn) {
+        this.any.splice(i, 1);
         return true;
       }
     }    

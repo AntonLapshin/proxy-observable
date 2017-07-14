@@ -53,7 +53,7 @@ describe("Observable", () => {
     n.should.be.equal(1);
   });
 
-  it("all", done => {
+  it("any", done => {
     const item = new Observable({});
     const fn1 = (e, value, _value) => {
       e.should.be.equal("test");
@@ -63,8 +63,8 @@ describe("Observable", () => {
     };
     const fn2 = () => {};
     fn2();
-    item.on("all", fn1);
-    item.on("all", fn2);
+    item.on("any", fn1);
+    item.on("any", fn2);
     item.fire("test", true);
     item.off(fn2);
     item.off(fn1);
