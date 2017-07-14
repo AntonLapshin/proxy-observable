@@ -5,48 +5,53 @@
 }(this, (function () { 'use strict';
 
 class Observable {
-  constructor(target) {
-    this.callbacks = {};
-    this.target = target;
+  constructor(o) {
+    this.fns = {};
+    this.o = o;
+    this.all = [];
   }
 
   /**
    * Checks if a property has at least one subscriber
    * 
-   * @param {string} property - Property name
+   * @param {string} prop - Property name
    * @returns {boolean}
    */
-  has(property) {
-    return property in this.callbacks && this.callbacks[property].length > 0;
+  has(prop) {
+    return prop in this.fns && this.fns[prop].length > 0 || this.all.length > 0;
   }
 
   /**
    * Subscribes on property change
    * 
-   * @param {string} property - Property name
-   * @param {function} callback
+   * @param {string} prop - Property name
+   * @param {function} fn
    * @returns {object} Observable
    */
-  on(property, callback) {
-    if (property in this.callbacks === false) {
-      this.callbacks[property] = [];
+  on(prop, fn) {
+    if (prop === "all") {
+      this.all.push(fn);
+      return this;
     }
-    this.callbacks[property].push(callback);
+    if (prop in this.fns === false) {
+      this.fns[prop] = [];
+    }
+    this.fns[prop].push(fn);
     return this;
   }
 
   /**
    * Calls the property's callbacks
    * 
-   * @param {string} property - Property name
+   * @param {string} prop - Property name
    * @param {object} value - New value
    * @returns {object} Observable
    */
-  fire(property, value) {
-    const prev = this.target[property];
-    // this.target[property] = value;
-    if (property in this.callbacks) {
-      this.callbacks[property].forEach(с => с(value, prev));
+  fire(prop, value) {
+    const prev = this.o[prop];
+    this.all.forEach(fn => fn(prop, value, prev));
+    if (prop in this.fns) {
+      this.fns[prop].forEach(fn => fn(value, prev));
     }
     return this;
   }
@@ -54,36 +59,41 @@ class Observable {
   /**
    * Unsubscribes from property change
    * 
-   * @param {function} callback
+   * @param {function} fn
    * @returns {boolean} if successfully unsubscribed
    */
-  off(callback) {
-    for (const property in this.callbacks) {
-      const cc = this.callbacks[property];
-      for (let i = 0; i < cc.length; i++) {
-        const c = cc[i];
-        if (c === callback) {
-          cc.splice(i, 1);
+  off(fn) {
+    for (const prop in this.fns) {
+      const fns = this.fns[prop];
+      for (let i = 0; i < fns.length; i++) {
+        if (fns[i] === fn) {
+          fns.splice(i, 1);
           return true;
         }
       }
     }
+    for (let i = 0; i < this.all.length; i++) {
+      if (this.all[i] === fn) {
+        this.all.splice(i, 1);
+        return true;
+      }
+    }    
     return false;
   }
 
   /**
    * Subscribes on property change once
    * 
-   * @param {string} property 
-   * @param {function} callback 
+   * @param {string} prop 
+   * @param {function} fn 
    */
-  once(property, callback) {
+  once(prop, fn) {
     const method = value => {
-      const prev = this.target[property];
-      callback(value, prev);
+      const prev = this.o[prop];
+      fn(value, prev);
       this.off(method);
     };
-    this.on(property, method);
+    this.on(prop, method);
   }
 }
 
@@ -99,45 +109,45 @@ var proxy = ctx => {
   }
   const o = new Observable(ctx);
   const observable = new Proxy(ctx, {
-    get: (target, property) => {
-      if (property in target) {
-        if (target.constructor === Array && property === "pop") {
-          o.fire("pop", target[target.length - 1]);
+    get: (t, prop) => {
+      if (prop in t) {
+        if (t.constructor === Array && prop === "pop") {
+          o.fire("pop", t[t.length - 1]);
         }
-        return target[property];
-      } else if (property === "on") {
+        return t[prop];
+      } else if (prop === "on") {
         /**
          * on: Subscribes on property change
          * 
          * @param {string} name Property name
-         * @param {function} callback (value, prev) => {}
+         * @param {function} fn (value, prev) => {}
          */
-        return (name, callback) => {
-          if (name in target) {
-            o.fire(name, target[name]);
+        return (name, fn) => {
+          if (name in t) {
+            o.fire(name, t[name]);
           }
-          o.on(name, callback);
+          o.on(name, fn);
         };
-      } else if (property === "off") {
+      } else if (prop === "off") {
         /**
          * off: Unsubscribes from property change
          * 
-         * @param {function} callback (value, prev) => {}
+         * @param {function} fn (value, prev) => {}
          */
-        return callback => {
-          o.off(callback);
+        return fn => {
+          o.off(fn);
         };
       } else {
         return undefined;
       }
     },
-    set: (target, property, value) => {
-      if (o.has(property)) {
-        o.fire(property, value);
-      } else if (target.constructor === Array && property !== "length") {
-        o.fire("change", value);
+    set: (t, prop, v) => {
+      if (t.constructor === Array && prop !== "length") {
+        o.fire("change", v);
+      } else if (o.has(prop)) {
+        o.fire(prop, v);
       }
-      target[property] = value;
+      t[prop] = v;
       return true;
     }
   });
