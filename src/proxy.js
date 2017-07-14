@@ -12,45 +12,45 @@ export default ctx => {
   }
   const o = new Observable(ctx);
   const observable = new Proxy(ctx, {
-    get: (target, property) => {
-      if (property in target) {
-        if (target.constructor === Array && property === "pop") {
-          o.fire("pop", target[target.length - 1]);
+    get: (t, prop) => {
+      if (prop in t) {
+        if (t.constructor === Array && prop === "pop") {
+          o.fire("pop", t[t.length - 1]);
         }
-        return target[property];
-      } else if (property === "on") {
+        return t[prop];
+      } else if (prop === "on") {
         /**
          * on: Subscribes on property change
          * 
          * @param {string} name Property name
-         * @param {function} callback (value, prev) => {}
+         * @param {function} fn (value, prev) => {}
          */
-        return (name, callback) => {
-          if (name in target) {
-            o.fire(name, target[name]);
+        return (name, fn) => {
+          if (name in t) {
+            o.fire(name, t[name]);
           }
-          o.on(name, callback);
+          o.on(name, fn);
         };
-      } else if (property === "off") {
+      } else if (prop === "off") {
         /**
          * off: Unsubscribes from property change
          * 
-         * @param {function} callback (value, prev) => {}
+         * @param {function} fn (value, prev) => {}
          */
-        return callback => {
-          o.off(callback);
+        return fn => {
+          o.off(fn);
         };
       } else {
         return undefined;
       }
     },
-    set: (target, property, value) => {
-      if (o.has(property)) {
-        o.fire(property, value);
-      } else if (target.constructor === Array && property !== "length") {
-        o.fire("change", value);
+    set: (t, prop, v) => {
+      if (t.constructor === Array && prop !== "length") {
+        o.fire("change", v);
+      } else if (o.has(prop)) {
+        o.fire(prop, v);
       }
-      target[property] = value;
+      t[prop] = v;
       return true;
     }
   });

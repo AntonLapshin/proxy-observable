@@ -71,4 +71,19 @@ describe("Proxy", () => {
     frodo.bag.push("ring");
     frodo.bag.pop();
   });
+
+  it("all", done => {
+    const frodo = {
+      name: "Frodo",
+      bag: observable([])
+    };
+
+    frodo.bag.on("all", (e, data) => {
+      e.should.be.equal("change");
+      data.should.be.equal("ring")
+      done();      
+    });
+
+    frodo.bag.push("ring");
+  });  
 });

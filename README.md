@@ -156,16 +156,31 @@ Frodo.bag.push("apple");
 Frodo.bag.push("ring");
 Frodo.bag.pop();
 Frodo.friends.pop();
-
 ```
 
 Just use `observable` if you want an object or an array to be observable
 
+## `all` event
+
+Do you want to track all the events? Just use `all` like this:
+
+```js
+// object
+soldier.inventory.on("all", (e, value, prev) => {
+  console.log(e); // "coins", "sword"
+});
+soldier.inventory.coins = 1000;
+soldier.inventory.sword = "Gold Dagger";
+
+// array
+Frodo.bag.on("all", (e, item) => {
+  console.log(e); // "change" or "pop"
+});
+```
+
 ---
 
 ES6 JavaScript Proxy MDN [documentation](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
-
-See also [proxy-observable API](api.md)
 
 ## Browsers support <sub><sup><sub><sub>made by <a href="https://godban.github.io">godban</a></sub></sub></sup></sub>
 

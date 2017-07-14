@@ -1,46 +1,51 @@
 export class Observable {
-  constructor(target) {
-    this.callbacks = {};
-    this.target = target;
+  constructor(o) {
+    this.fns = {};
+    this.o = o;
+    this.all = [];
   }
 
   /**
    * Checks if a property has at least one subscriber
    * 
-   * @param {string} property - Property name
+   * @param {string} prop - Property name
    * @returns {boolean}
    */
-  has(property) {
-    return property in this.callbacks && this.callbacks[property].length > 0;
+  has(prop) {
+    return prop in this.fns && this.fns[prop].length > 0 || this.all.length > 0;
   }
 
   /**
    * Subscribes on property change
    * 
-   * @param {string} property - Property name
-   * @param {function} callback
+   * @param {string} prop - Property name
+   * @param {function} fn
    * @returns {object} Observable
    */
-  on(property, callback) {
-    if (property in this.callbacks === false) {
-      this.callbacks[property] = [];
+  on(prop, fn) {
+    if (prop === "all") {
+      this.all.push(fn);
+      return this;
     }
-    this.callbacks[property].push(callback);
+    if (prop in this.fns === false) {
+      this.fns[prop] = [];
+    }
+    this.fns[prop].push(fn);
     return this;
   }
 
   /**
    * Calls the property's callbacks
    * 
-   * @param {string} property - Property name
+   * @param {string} prop - Property name
    * @param {object} value - New value
    * @returns {object} Observable
    */
-  fire(property, value) {
-    const prev = this.target[property];
-    // this.target[property] = value;
-    if (property in this.callbacks) {
-      this.callbacks[property].forEach(с => с(value, prev));
+  fire(prop, value) {
+    const prev = this.o[prop];
+    this.all.forEach(fn => fn(prop, value, prev));
+    if (prop in this.fns) {
+      this.fns[prop].forEach(fn => fn(value, prev));
     }
     return this;
   }
@@ -48,35 +53,40 @@ export class Observable {
   /**
    * Unsubscribes from property change
    * 
-   * @param {function} callback
+   * @param {function} fn
    * @returns {boolean} if successfully unsubscribed
    */
-  off(callback) {
-    for (const property in this.callbacks) {
-      const cc = this.callbacks[property];
-      for (let i = 0; i < cc.length; i++) {
-        const c = cc[i];
-        if (c === callback) {
-          cc.splice(i, 1);
+  off(fn) {
+    for (const prop in this.fns) {
+      const fns = this.fns[prop];
+      for (let i = 0; i < fns.length; i++) {
+        if (fns[i] === fn) {
+          fns.splice(i, 1);
           return true;
         }
       }
     }
+    for (let i = 0; i < this.all.length; i++) {
+      if (this.all[i] === fn) {
+        this.all.splice(i, 1);
+        return true;
+      }
+    }    
     return false;
   }
 
   /**
    * Subscribes on property change once
    * 
-   * @param {string} property 
-   * @param {function} callback 
+   * @param {string} prop 
+   * @param {function} fn 
    */
-  once(property, callback) {
+  once(prop, fn) {
     const method = value => {
-      const prev = this.target[property];
-      callback(value, prev);
+      const prev = this.o[prop];
+      fn(value, prev);
       this.off(method);
     };
-    this.on(property, method);
+    this.on(prop, method);
   }
 }
