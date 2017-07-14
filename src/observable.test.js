@@ -7,7 +7,7 @@ describe("Observable", () => {
     const callback = () => {};
     item.has("test").should.be.equal(false);
     item.on("test", callback);
-    item.change("test", true);
+    item.fire("test", true);
     item.has("test").should.be.equal(true);
     item.off(callback);
     item.has("test").should.be.equal(false);
@@ -21,15 +21,7 @@ describe("Observable", () => {
       done();
     });
     item.on("test", () => {}); // second callback to the pool
-    item.change("test", true);
-  });
-
-  it("change", () => {
-    const item = new Observable({});
-    item.change("test", true);
-    item.target["test"].should.be.equal(true);
-    item.change("test", false);
-    item.target["test"].should.be.equal(false);
+    item.fire("test", true);
   });
 
   it("off", () => {
@@ -43,9 +35,9 @@ describe("Observable", () => {
     const fakeCallback = () => {};
     item.off(fakeCallback).should.be.equal(false);
     fakeCallback();
-    item.change("test", true);
+    item.fire("test", true);
     item.off(callback).should.be.equal(true);
-    item.change("test", false);
+    item.fire("test", false);
     n.should.be.equal(1);
   });
 
@@ -56,8 +48,8 @@ describe("Observable", () => {
       n++;
     };
     item.once("test", callback);
-    item.change("test", true);
-    item.change("test", false);
+    item.fire("test", true);
+    item.fire("test", false);
     n.should.be.equal(1);
   });
 });

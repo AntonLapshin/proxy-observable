@@ -53,4 +53,22 @@ describe("Proxy", () => {
 
     observable(soldier.inventory).coins.should.be.equal(999);
   });
+
+  it("arrays", done => {
+    const frodo = {
+      name: "Frodo",
+      bag: observable([])
+    };
+
+    frodo.bag.on("change", data => {
+      data.should.be.equal("ring")
+    });
+    frodo.bag.on("pop", data => {
+      data.should.be.equal("ring");
+      done();
+    });  
+
+    frodo.bag.push("ring");
+    frodo.bag.pop();
+  });
 });

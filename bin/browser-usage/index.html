@@ -1,0 +1,55 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Observable</title>
+  <meta name="description" content="Observable Browser Sample">
+  <meta name="author" content="AntonLapshin">
+
+</head>
+
+<body>
+  <script src="../proxy.observable.es6.js"></script>
+  <script>
+    const Frodo = observable({
+      name: "Frodo Baggins",
+      bag: observable([]),
+      friends: observable([])
+    });
+
+    const Samwise = {
+      name: "Samwise Gamgee",
+      friends: [Frodo]
+    };
+
+    Frodo.friends.on("change", friend => {
+      console.log(`Frodo has a new friend ${friend.name}! Cograts!`);
+    });
+
+    Frodo.bag.on("change", item => {
+      console.log("Frodo got a new item: " + item);
+      if (item === "ring") {
+        console.log("Oh! My Precious!");
+      }
+    });
+
+    Frodo.bag.on("pop", item => {
+      console.log("Frodo lost an item: " + item);
+      if (item === "ring") {
+        console.log("Gollum! I'm coming to get you!");
+      }
+    });
+
+    Frodo.friends.push(Samwise);
+    Frodo.bag.push("apple");
+    Frodo.bag.push("ring");
+    Frodo.bag.pop();
+    Frodo.friends.pop();
+
+  </script>
+</body>
+
+</html>

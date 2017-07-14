@@ -36,9 +36,9 @@ export class Observable {
    * @param {object} value - New value
    * @returns {object} Observable
    */
-  change(property, value) {
+  fire(property, value) {
     const prev = this.target[property];
-    this.target[property] = value;
+    // this.target[property] = value;
     if (property in this.callbacks) {
       this.callbacks[property].forEach(с => с(value, prev));
     }

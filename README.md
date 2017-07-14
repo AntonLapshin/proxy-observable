@@ -1,5 +1,5 @@
 # proxy-observable
-ES6 Proxy observable implementation
+ES6 Proxy observable implementation. Supports Arrays and Objects
 
 [![Build Status](https://travis-ci.org/AntonLapshin/proxy-observable.svg?branch=master)](https://travis-ci.org/AntonLapshin/proxy-observable)
 [![Coverage Status](https://coveralls.io/repos/github/AntonLapshin/proxy-observable/badge.svg?branch=master&v=1)](https://coveralls.io/github/AntonLapshin/proxy-observable?branch=master)
@@ -25,7 +25,8 @@ const soldier = {
   inventory: observable({
     sword: "Dagger",
     coins: 0
-  })
+  }),
+  friends: observable([])
 };
 
 console.log(JSON.stringify(soldier)); 
@@ -37,17 +38,30 @@ console.log(JSON.stringify(soldier));
 }
 */
 
+//
+// inventory Object
+//
 const callback = (value, prev) => {
   console.log(value, prev); // 100 0
 }
 
 console.log(soldier.inventory.coins); // 0
 console.log(soldier.inventory.sword); // "Dagger"
-
 soldier.inventory.on("coins", callback);
 soldier.inventory.coins = 100; // callback will be called
-
 soldier.inventory.off(callback);
+
+//
+// friends Array
+//
+soldier.friends.on("change", item => {
+  console.log(item); // "Lucius Vorenus"
+});
+soldier.friends.push("Lucius Vorenus"); // or soldier.friends[0] = "Lucius Vorenus"
+soldier.friends.on("pop", item => {
+  console.log(item); // "Lucius Vorenus"
+});
+soldier.friends.pop();
 ```
 
 Simply speaking `soldier.inventory` is still just a simple object, but it has additionally a few things:
@@ -56,11 +70,24 @@ Simply speaking `soldier.inventory` is still just a simple object, but it has ad
 + method `off` for unsubscribing
 + you can call just `soldier.inventory.newProp = value` to define a new prop, instead of using `soldier.inventory["newProp"] = value` syntax
 
----
+`soldier.friends` is still just a simple array with `on` and `off` methods and predefined events
 
-ES6 JavaScript Proxy MDN [documentation](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+Array events
+------------
 
-See also [proxy-observable API](api.md)
+`change` - Fires when an item in an array is changed:
+
+```js
+arr[0] = "new value";
+// or
+arr.push("new value");
+```
+
+`pop` - Fires when pop method is called:
+
+```js
+arr.pop();
+```
 
 ---
 
@@ -90,6 +117,55 @@ Browser Usage
   soldier.inventory.coins = 100;
 </script>
 ```
+
+## More complicated example
+
+```js
+
+const Frodo = observable({
+  name: "Frodo Baggins",
+  bag: observable([]),
+  friends: observable([])
+});
+
+const Samwise = {
+  name: "Samwise Gamgee",
+  friends: [Frodo]
+};
+
+Frodo.friends.on("change", friend => {
+  console.log(`Frodo has a new friend ${friend.name}! Cograts!`);
+});
+
+Frodo.bag.on("change", item => {
+  console.log("Frodo got a new item: " + item);
+  if (item === "ring"){
+    console.log("Oh! My Precious!");
+  }
+});
+
+Frodo.bag.on("pop", item => {
+  console.log("Frodo lost an item: " + item);  
+  if (item === "ring"){
+    console.log("Gollum! I'm coming to get you!");
+  }
+});
+
+Frodo.friends.push(Samwise);
+Frodo.bag.push("apple");
+Frodo.bag.push("ring");
+Frodo.bag.pop();
+Frodo.friends.pop();
+
+```
+
+Just use `observable` if you want an object or an array to be observable
+
+---
+
+ES6 JavaScript Proxy MDN [documentation](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+
+See also [proxy-observable API](api.md)
 
 ## Browsers support <sub><sup><sub><sub>made by <a href="https://godban.github.io">godban</a></sub></sub></sup></sub>
 

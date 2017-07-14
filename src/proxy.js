@@ -14,6 +14,9 @@ export default ctx => {
   const observable = new Proxy(ctx, {
     get: (target, property) => {
       if (property in target) {
+        if (target.constructor === Array && property === "pop") {
+          o.fire("pop", target[target.length - 1]);
+        }
         return target[property];
       } else if (property === "on") {
         /**
@@ -24,7 +27,7 @@ export default ctx => {
          */
         return (name, callback) => {
           if (name in target) {
-            o.change(name, target[name]);
+            o.fire(name, target[name]);
           }
           o.on(name, callback);
         };
@@ -43,10 +46,11 @@ export default ctx => {
     },
     set: (target, property, value) => {
       if (o.has(property)) {
-        o.change(property, value);
-      } else {
-        target[property] = value;
+        o.fire(property, value);
+      } else if (target.constructor === Array && property !== "length") {
+        o.fire("change", value);
       }
+      target[property] = value;
       return true;
     }
   });
