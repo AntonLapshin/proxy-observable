@@ -8,13 +8,13 @@ ES6 Proxy observable implementation. Supports Arrays and Objects
 [![npm](https://img.shields.io/npm/dt/proxy-observable.svg)](https://www.npmjs.com/package/proxy-observable)
 [![GitHub stars](https://img.shields.io/github/stars/AntonLapshin/proxy-observable.svg?style=social&label=Star)](https://github.com/AntonLapshin/proxy-observable)
 
-Install
--------
+## Install
 
     npm install proxy-observable --save
 
-Usage
------
+## Usage
+
+Just call `observable()` if you want an object or an array to be observable
 
 ```js
 import observable from "proxy-observable";
@@ -26,30 +26,34 @@ const soldier = {
     sword: "Dagger",
     coins: 0
   }),
-  friends: observable([])
+  friends: observable(["Gaius Octavian"])
 };
 
-console.log(JSON.stringify(soldier)); 
-/*
+console.log(JSON.stringify(soldier, null, 2)); 
+/* 
 {
   "name": "Titus Pullo",
   "age": 36,
-  "inventory": { "sword": "Dagger", "coins": 0 }
+  "inventory": {
+    "sword": "Dagger",
+    "coins": 0
+  },
+  "friends": [
+    "Gaius Octavian"
+  ]
 }
 */
 
 //
 // inventory Object
 //
-const callback = (value, prev) => {
-  console.log(value, prev); // 100 0
-}
-
 console.log(soldier.inventory.coins); // 0
 console.log(soldier.inventory.sword); // "Dagger"
-soldier.inventory.on("coins", callback);
-soldier.inventory.coins = 100; // callback will be called
-soldier.inventory.off(callback);
+const onCoinsChanged = soldier.inventory.on("coins", (value, prev) => {
+  console.log(value, prev); // 100 0
+});
+soldier.inventory.coins = 100; // onCoinsChanged will be called
+soldier.inventory.off(onCoinsChanged);
 
 //
 // friends Array
@@ -57,23 +61,23 @@ soldier.inventory.off(callback);
 soldier.friends.on("change", item => {
   console.log(item); // "Lucius Vorenus"
 });
-soldier.friends.push("Lucius Vorenus"); // or soldier.friends[0] = "Lucius Vorenus"
-soldier.friends.on("pop", item => {
-  console.log(item); // "Lucius Vorenus"
+soldier.friends.on("shift", item => {
+  console.log(item); // "Gaius Octavian"
 });
-soldier.friends.pop();
+soldier.friends.push("Lucius Vorenus"); // or soldier.friends[0] = "Lucius Vorenus"
+soldier.friends.shift();
 ```
 
 Simply speaking `soldier.inventory` is still just a simple object, but it has additionally a few things:
 
-+ method `on` for subscribing
-+ method `off` for unsubscribing
-+ you can call just `soldier.inventory.newProp = value` to define a new prop, instead of using `soldier.inventory["newProp"] = value` syntax
++ method `on` Attach a handler to an event for the elements.
++ method `once` Attach a handler to an event for the elements. The handler is executed at most once per element per event type.
++ method `off` Remove an event handler
++ you can call just `soldier.inventory.newProp = value` to define a new prop, instead of `soldier.inventory["newProp"] = value`
 
-`soldier.friends` is still just a simple array with `on` and `off` methods and predefined events
+`soldier.friends` is still just a simple array with `on`, `once` and `off` methods and predefined events
 
-Array events
-------------
+## Array events
 
 `change` - Fires when an item in an array is changed:
 
@@ -83,16 +87,44 @@ arr[0] = "new value";
 arr.push("new value");
 ```
 
-`pop` - Fires when pop method is called:
+`pop` - Fires when `pop` method is called:
 
 ```js
 arr.pop();
 ```
 
+`shift` - Fires when `shift` method is called:
+
+```js
+arr.shift();
+```
+
 ---
 
-Browser Usage
------
+## `any` event
+
+Do you want to track all the events? Just use `any` like this:
+
+```js
+// object
+soldier.inventory.on("any", (value, prev, prop) => {
+  console.log(prop); // "coins", "shield"
+});
+soldier.inventory.coins = 1000;
+// This way you can track when a new property is added to an object
+soldier.inventory.shield = "Gold Shield"; 
+
+// array
+soldier.friends.on("any", (value, prev, e) => {
+  console.log(e); // "change", "pop", "shift" or any other method of Array
+});
+soldier.friends[0] = "Mark Antony";
+soldier.friends.pop() = "Mark Antony";
+```
+
+---
+
+## Browser Usage
 
 ```html
 <!-- ES6 not minified version -->
@@ -118,10 +150,9 @@ Browser Usage
 </script>
 ```
 
-## More complicated example
+## One more example
 
 ```js
-
 const Frodo = observable({
   name: "Frodo Baggins",
   bag: observable([]),
@@ -137,17 +168,17 @@ Frodo.friends.on("change", friend => {
   console.log(`Frodo has a new friend ${friend.name}! Cograts!`);
 });
 
-Frodo.bag.on("change", item => {
-  console.log("Frodo got a new item: " + item);
-  if (item === "ring"){
-    console.log("Oh! My Precious!");
-  }
-});
-
-Frodo.bag.on("pop", item => {
-  console.log("Frodo lost an item: " + item);  
-  if (item === "ring"){
-    console.log("Gollum! I'm coming to get you!");
+Frodo.bag.on("any", (item, prev, e) => {
+  if (e === "change") {
+    console.log("Frodo got a new item: " + item);
+    if (item === "ring") {
+      console.log("Oh! My Precious!");
+    }
+  } else if (e === "pop" || e === "shift"){
+    console.log("Frodo lost an item: " + item);
+    if (item === "ring") {
+      console.log("Gollum! I'm coming to get you!");
+    }        
   }
 });
 
@@ -156,26 +187,6 @@ Frodo.bag.push("apple");
 Frodo.bag.push("ring");
 Frodo.bag.pop();
 Frodo.friends.pop();
-```
-
-Just use `observable` if you want an object or an array to be observable
-
-## `any` event
-
-Do you want to track all the events? Just use `any` like this:
-
-```js
-// object
-soldier.inventory.on("any", (e, value, prev) => {
-  console.log(e); // "coins", "sword"
-});
-soldier.inventory.coins = 1000;
-soldier.inventory.sword = "Gold Dagger";
-
-// array
-Frodo.bag.on("any", (e, item) => {
-  console.log(e); // "change" or "pop"
-});
 ```
 
 ---

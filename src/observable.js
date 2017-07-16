@@ -1,92 +1,52 @@
-export class Observable {
-  constructor(o) {
-    this.fns = {};
-    this.o = o;
-    this.any = [];
-  }
+import { PubSub } from "./pubsub";
 
-  /**
-   * Checks if a property has at least one subscriber
-   * 
-   * @param {string} prop - Property name
-   * @returns {boolean}
-   */
-  has(prop) {
-    return prop in this.fns && this.fns[prop].length > 0 || this.any.length > 0;
+/**
+ * Creates a proxy observable for an object or array
+ * 
+ * @param {object|Observable} target Input Object
+ * @returns {Observable} Observable (ES6 Proxy)
+ */
+export default target => {
+  if (target.on && target.off) {
+    return target;
   }
-
-  /**
-   * Subscribes on property change
-   * 
-   * @param {string} prop - Property name
-   * @param {function} fn
-   * @returns {object} Observable
-   */
-  on(prop, fn) {
-    if (prop === "any") {
-      this.any.push(fn);
-      return this;
-    }
-    if (prop in this.fns === false) {
-      this.fns[prop] = [];
-    }
-    this.fns[prop].push(fn);
-    return this;
-  }
-
-  /**
-   * Calls the property's callbacks
-   * 
-   * @param {string} prop - Property name
-   * @param {object} value - New value
-   * @returns {object} Observable
-   */
-  fire(prop, value) {
-    const prev = this.o[prop];
-    this.any.forEach(fn => fn(prop, value, prev));
-    if (prop in this.fns) {
-      this.fns[prop].forEach(fn => fn(value, prev));
-    }
-    return this;
-  }
-
-  /**
-   * Unsubscribes from property change
-   * 
-   * @param {function} fn
-   * @returns {boolean} if successfully unsubscribed
-   */
-  off(fn) {
-    for (const prop in this.fns) {
-      const fns = this.fns[prop];
-      for (let i = 0; i < fns.length; i++) {
-        if (fns[i] === fn) {
-          fns.splice(i, 1);
-          return true;
+  const pub = new PubSub();
+  const observable = new Proxy(target, {
+    get: (target, prop) => {
+      if (prop in target) {
+        if (target.constructor === Array) {
+          let v = observable;
+          if (prop === "pop") {
+            v = target[target.length - 1];
+          } else if (prop === "shift") {
+            v = target[0];
+          }
+          if (prop !== "push" && prop !== "length") {
+            pub.fire(prop, v);
+          }
         }
+        return target[prop];
+      } else if (prop === "on") {
+        return pub.on.bind(pub);
+      } else if (prop === "once") {
+        return pub.once.bind(pub);        
+      } else if (prop === "off") {
+        return pub.off.bind(pub);
       }
+      return undefined;
+    },
+    set: (target, prop, v) => {
+      if (target.constructor === Array) {
+        if (prop !== "length") {
+          pub.fire("change", v);
+        }
+      } else if (pub.has(prop)) {
+        pub.fire(prop, v, target[prop]);
+      }
+      target[prop] = v;
+      return true;
     }
-    for (let i = 0; i < this.any.length; i++) {
-      if (this.any[i] === fn) {
-        this.any.splice(i, 1);
-        return true;
-      }
-    }    
-    return false;
-  }
+  });
 
-  /**
-   * Subscribes on property change once
-   * 
-   * @param {string} prop 
-   * @param {function} fn 
-   */
-  once(prop, fn) {
-    const method = value => {
-      const prev = this.o[prop];
-      fn(value, prev);
-      this.off(method);
-    };
-    this.on(prop, method);
-  }
-}
+  return observable;
+};

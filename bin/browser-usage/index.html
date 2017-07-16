@@ -29,17 +29,17 @@
       console.log(`Frodo has a new friend ${friend.name}! Cograts!`);
     });
 
-    Frodo.bag.on("change", item => {
-      console.log("Frodo got a new item: " + item);
-      if (item === "ring") {
-        console.log("Oh! My Precious!");
-      }
-    });
-
-    Frodo.bag.on("pop", item => {
-      console.log("Frodo lost an item: " + item);
-      if (item === "ring") {
-        console.log("Gollum! I'm coming to get you!");
+    Frodo.bag.on("any", (item, prev, e) => {
+      if (e === "change") {
+        console.log("Frodo got a new item: " + item);
+        if (item === "ring") {
+          console.log("Oh! My Precious!");
+        }
+      } else if (e === "pop" || e === "shift"){
+        console.log("Frodo lost an item: " + item);
+        if (item === "ring") {
+          console.log("Gollum! I'm coming to get you!");
+        }        
       }
     });
 
@@ -48,7 +48,6 @@
     Frodo.bag.push("ring");
     Frodo.bag.pop();
     Frodo.friends.pop();
-
   </script>
 </body>
 

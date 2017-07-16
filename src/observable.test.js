@@ -1,72 +1,102 @@
 import should from "should";
-import { Observable } from "./observable";
+import observable from "./observable";
 
 describe("Observable", () => {
-  it("has", () => {
-    const item = new Observable({});
-    const callback = () => {};
-    item.has("test").should.be.equal(false);
-    item.on("test", callback);
-    item.fire("test", true);
-    item.has("test").should.be.equal(true);
-    item.off(callback);
-    item.has("test").should.be.equal(false);
+  it("basic usage", () => {
+    const ob = observable({
+      coins: 0
+    });
+    ob.coins.should.be.equal(0);
+
+    ob.on("coins", (value, prev, prop) => {
+      value.should.be.equal(100);
+      prev.should.be.equal(0);
+      prop.should.be.equal("coins");
+    });
+
+    // non existing
+    const callback = ob.on("nonExistingField", () => {});
+    callback();
+
+    should.not.exist(ob.nonExistingField);
+    ob.coins = 100;
+
+    ob.once("any", (value, prev, prop) => {
+      value.should.be.equal(36);
+      should.not.exist(prev);
+      prop.should.be.equal("age");
+    });
+
+    ob.age = 36;
+    ob.age = 40;
   });
 
-  it("on", done => {
-    const item = new Observable({});
-    item.on("test", (value, _value) => {
-      value.should.be.equal(true);
-      should.not.exist(_value);
+  it("advanced usage", () => {
+    const ob = observable({
+      coins: 0
+    });
+    let n = 0;
+    const callback = ob.on("coins", (value, prev, prop) => {
+      n++;
+    });
+
+    ob.coins = 100;
+    ob.off(callback);
+    ob.coins = 999;
+    n.should.be.equal(1);
+
+    ob.shield = "Scutum";
+    ob.shield.should.be.equal("Scutum");
+
+    observable(ob).coins.should.be.equal(999);
+  });
+
+  it("arrays", done => {
+    const bag = observable([]);
+
+    const changeCallback = bag.on("change", (value, prev, prop) => {
+      value.should.be.equal("ring");
+      should.not.exist(prev);
+      prop.should.be.equal("change");
+    });
+    bag.on("pop", (value, prev, prop) => {
+      value.should.be.equal("ring");
+      should.not.exist(prev);
+      prop.should.be.equal("pop");
+    });
+    bag.push("ring");
+    bag.pop();
+
+    bag.off(changeCallback);
+    bag.on("shift", (value, prev, prop) => {
+      value.should.be.equal("ring");
+      should.not.exist(prev);
+      prop.should.be.equal("shift");
       done();
     });
-    item.on("test", () => {}); // second callback to the pool
-    item.fire("test", true);
-  });
-
-  it("off", () => {
-    const item = new Observable({});
-    let n = 0;
-    const callback = () => {
-      n++;
-    };
-    item.off(callback).should.be.equal(false);
-    item.on("test", callback);
-    const fakeCallback = () => {};
-    item.off(fakeCallback).should.be.equal(false);
-    fakeCallback();
-    item.fire("test", true);
-    item.off(callback).should.be.equal(true);
-    item.fire("test", false);
-    n.should.be.equal(1);
-  });
-
-  it("once", () => {
-    const item = new Observable({});
-    let n = 0;
-    const callback = () => {
-      n++;
-    };
-    item.once("test", callback);
-    item.fire("test", true);
-    item.fire("test", false);
-    n.should.be.equal(1);
+    bag.push("ring");
+    bag.push("apple");
+    bag.shift();
   });
 
   it("any", done => {
-    const item = new Observable({});
-    const fn1 = (e, value, _value) => {
-      e.should.be.equal("test");
-      value.should.be.equal(true);
-      should.not.exist(_value);
+    const ob = observable({ coins: 0 });
+    const bag = observable([]);
+
+    ob.on("any", (value, prev, prop) => {
+      value.should.be.equal(100);
+      prev.should.be.equal(0);
+      prop.should.be.equal("coins");
+    });
+
+    bag.on("any", (value, prev, prop) => {
+      value.should.be.equal("ring");
+      should.not.exist(prev);
+      prop.should.be.equal("change");
       done();
-    };
-    const fn2 = () => {};
-    fn2();
-    item.on("any", fn1);
-    item.on("any", fn2);
-    item.fire("test", true);
-    item.off(fn2);
-    item.off(fn1);
-  });  
+    });
+
+    ob.coins = 100;
+    bag.push("ring");
+  });
 });
