@@ -1,6 +1,6 @@
 {
   "name": "proxy-observable",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "ES6 Proxy observable implementation",
   "scripts": {
     "test-manual": "./node_modules/.bin/mocha --require babel-register ./src/**/*.test.js --timeout 999000",

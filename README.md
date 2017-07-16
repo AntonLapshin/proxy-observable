@@ -99,6 +99,8 @@ arr.pop();
 arr.shift();
 ```
 
+`any other Array's methods`
+
 ---
 
 ## `any` event
@@ -119,7 +121,7 @@ soldier.friends.on("any", (value, prev, e) => {
   console.log(e); // "change", "pop", "shift" or any other method of Array
 });
 soldier.friends[0] = "Mark Antony";
-soldier.friends.pop() = "Mark Antony";
+soldier.friends.pop();
 ```
 
 ---
