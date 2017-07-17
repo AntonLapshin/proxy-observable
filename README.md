@@ -16,6 +16,8 @@ ES6 Proxy observable implementation. Supports Arrays and Objects
 
 Just call `observable()` if you want an object or an array to be observable
 
+[API](#API)
+
 ```js
 import observable from "proxy-observable";
 
@@ -30,7 +32,9 @@ const soldier = {
 };
 
 console.log(JSON.stringify(soldier, null, 2)); 
-/* 
+```
+
+```json
 {
   "name": "Titus Pullo",
   "age": 36,
@@ -42,42 +46,43 @@ console.log(JSON.stringify(soldier, null, 2));
     "Gaius Octavian"
   ]
 }
-*/
+```
 
-//
-// inventory Object
-//
-console.log(soldier.inventory.coins); // 0
-console.log(soldier.inventory.sword); // "Dagger"
-const onCoinsChanged = soldier.inventory.on("coins", (value, prev) => {
-  console.log(value, prev); // 100 0
-});
+## Object
+
+```js
+const onCoinsChanged = 
+  soldier.inventory.on("coins", (value, prev) => {
+    console.log(value, prev); // 100 0
+  });
 soldier.inventory.coins = 100; // onCoinsChanged will be called
 soldier.inventory.off(onCoinsChanged);
-
-//
-// friends Array
-//
-soldier.friends.on("change", item => {
-  console.log(item); // "Lucius Vorenus"
-});
-soldier.friends.on("shift", item => {
-  console.log(item); // "Gaius Octavian"
-});
-soldier.friends.push("Lucius Vorenus"); // or soldier.friends[0] = "Lucius Vorenus"
-soldier.friends.shift();
 ```
 
 Simply speaking `soldier.inventory` is still just a simple object, but it has additionally a few things:
 
-+ method `on` Attach a handler to an event for the elements.
-+ method `once` Attach a handler to an event for the elements. The handler is executed at most once per element per event type.
++ method `on` Attach a handler to an event for the elements
++ method `once` Attach a handler to an event for the elements. The handler is executed at most once per element per event type
 + method `off` Remove an event handler
 + you can call just `soldier.inventory.newProp = value` to define a new prop, instead of `soldier.inventory["newProp"] = value`
 
+## Array
+
+```js
+soldier.friends.on("change", item => {
+  console.log(item); // "Lucius Vorenus" twice
+});
+soldier.friends.on("shift", item => {
+  console.log(item); // "Gaius Octavian"
+});
+soldier.friends.push("Lucius Vorenus"); 
+soldier.friends[0] = "Lucius Vorenus"
+soldier.friends.shift();
+```
+
 `soldier.friends` is still just a simple array with `on`, `once` and `off` methods and predefined events
 
-## Array events
+### Array events
 
 `change` - Fires when an item in an array is changed:
 
@@ -118,7 +123,8 @@ soldier.inventory.shield = "Gold Shield";
 
 // array
 soldier.friends.on("any", (value, prev, e) => {
-  console.log(e); // "change", "pop", "shift" or any other method of Array
+  // e is "change", "pop", "shift" or any other method of Array
+  console.log(e); 
 });
 soldier.friends[0] = "Mark Antony";
 soldier.friends.pop();
@@ -190,6 +196,63 @@ Frodo.bag.push("ring");
 Frodo.bag.pop();
 Frodo.friends.pop();
 ```
+
+<a name="API"></a>
+
+# API
+
+## observable(ctx) => <code>ctx</code>
+Makes an object or array observable
+
+**Returns**: <code>object|array</code> - Observable object or array
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ctx | <code>object\|array</code> | Input Object or Array |
+
+---
+
+## observable.on(e, callback) => <code>callback</code>
+Subscribes on event (property changed)
+
+**Returns**: <code>function</code> - Input callback for unsubscribing
+
+| Param | Type | Description |
+| --- | --- | --- |
+| e | <code>string</code> | Event name or property name |
+| callback | <code>function</code> | Callback |
+
+## Callback signature
+(value, prev, e) => {}
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>any</code> | Current value |
+| prev | <code>any</code> | Previous value |
+| e | <code>string</code> | Event name or property name |
+
+---
+
+## observable.once(e, callback) => <code>callback</code>
+Subscribes once. The handler is executed at most once per element per event type
+
+**Returns**: <code>function</code> - Input callback for unsubscribing
+
+| Param | Type | Description |
+| --- | --- | --- |
+| e | <code>string</code> | Event name or property name |
+| callback | <code>function</code> | Callback |
+
+---
+
+## observable.off(callback) => <code>boolean</code>
+Removes event handler
+
+**Returns**: <code>boolean</code> - True if unsubscribed
+
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>function</code> | Callback |
 
 ---
 
