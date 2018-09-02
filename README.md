@@ -1,5 +1,10 @@
 # proxy-observable
+
 ES6 Proxy observable implementation. Supports Arrays and Objects
+
+## Attention! 
+
+Please keep in mind that the implementation is based on ES6 Proxy feature which is [a very slow thingy](http://thecodebarbarian.com/thoughts-on-es6-proxies-performance)
 
 [![Build Status](https://travis-ci.org/AntonLapshin/proxy-observable.svg?branch=master)](https://travis-ci.org/AntonLapshin/proxy-observable)
 [![Coverage Status](https://coveralls.io/repos/github/AntonLapshin/proxy-observable/badge.svg?branch=master&v=1)](https://coveralls.io/github/AntonLapshin/proxy-observable?branch=master)
