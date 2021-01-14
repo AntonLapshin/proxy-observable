@@ -38,6 +38,12 @@ describe("PubSub", () => {
     item.off(callback).should.be.equal(true);
     item.fire("test", false);
     n.should.be.equal(1);
+    const onceCallback = item.once("test", () => {
+      n++;
+    });
+    item.off(onceCallback).should.be.equal(true);
+    item.fire("test", true);
+    n.should.be.equal(1);
   });
 
   it("once", () => {

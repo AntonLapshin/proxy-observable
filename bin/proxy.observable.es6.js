@@ -76,7 +76,7 @@ class PubSub {
    * 
    * @param {string} e Event name 
    * @param {function} fn Callback
-   * @returns {function} Input callback
+   * @returns {function} Callback for unsubscribing
    */
   once(e, fn) {
     const method = (value, prev, prop) => {
@@ -84,7 +84,7 @@ class PubSub {
       this.off(method);
     };
     this.on(e, method);
-    return fn;
+    return method;
   }
 }
 
